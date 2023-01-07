@@ -1,3 +1,20 @@
+# Colocar em Produção no GITHUB
+
+npm install --save gh-pages
+
+no: package.json
+
+"private": true,
+  "homepage": "https://computeibr.github.io/my-app",
+
+  "scripts": {
+    
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build",
+
+
+npm run deploy
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
