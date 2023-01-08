@@ -1,8 +1,9 @@
 import React from 'react';
+import { MapContainer, TileLayer, Marker, Popup, Tooltip, ScaleControl, LayersControl } from "react-leaflet";
 import { Icon } from "leaflet";
 import { useEffect, useState } from 'react';
-   
-
+import "leaflet/dist/leaflet.css";
+import './App.css';
 import { Chart } from "react-google-charts";
 
 import 'moment/locale/pt-br'
@@ -11,6 +12,7 @@ import axios from 'axios';
 
 import favorito from '../src/Data/favorito.json'
 
+const deslizamento = new Icon({ iconUrl: "/deslizamento.png", iconSize: [40, 40], shadowSize:   [50, 64] })
 const open = new Icon({ iconUrl: "/open.gif", iconSize: [35, 35] })
 const camera = new Icon({ iconUrl: "/camera.png", iconSize: [15, 15] })
 const operacaopolicial = new Icon({ iconUrl: "/operacaopolicial.png", iconSize: [40, 40] })
@@ -20,12 +22,13 @@ const falhanosemaforo = new Icon({ iconUrl: "/falhanosemaforo.png", iconSize: [3
 const acidenteleve = new Icon({ iconUrl: "/acidenteleve.png", iconSize: [40, 40] })
 const asfaltoliso = new Icon({ iconUrl: "/asfaltoliso.png", iconSize: [40, 40] })
 const evento = new Icon({ iconUrl: "/evento.png", iconSize: [40, 40], shadowSize:   [50, 64] })
-const manifestacao = new Icon({ iconUrl: "/manifestacao.png", iconSize: [40, 40], shadowSize:   [50, 64] })
-const deslizamento = new Icon({ iconUrl: "/deslizamento.png", iconSize: [40, 40], shadowSize:   [50, 64] })
+const manifestacao = new Icon({ iconUrl: "../manifestacao.png", iconSize: [40, 40], shadowSize:   [50, 64] })
 const vazamentodeagua = new Icon({ iconUrl: "/vazamentodeagua.png", iconSize: [30, 30] })
 const bueiro = new Icon({ iconUrl: "/bueiro.png", iconSize: [40, 40] })
 const incendio = new Icon({ iconUrl: "/incendio.png", iconSize: [30, 30] })
 const quedadearvore = new Icon({ iconUrl: "/quedadearvore.png", iconSize: [45, 45] })
+
+
 
 
 
@@ -1025,6 +1028,121 @@ function App() {
 
                     <div className="row">
 
+                            {/*  Coluna */}
+                              <div className="col-xl-3 col-lg-7">
+                                  
+                                  <div className="card shadow mb-4">
+                                      <div className="card-header py-3">
+                                          <h6 className="m-0 font-weight-bold text-primary">Abertas ({search}) </h6>
+                                      </div>
+                                      <div className="card-body">
+                                          <Chart
+                                              chartType="Bar"
+                                              width="100%"
+                                              height="400px"
+                                              data={chartData}
+                                              options={options}
+
+                                          />
+
+                                      </div>
+                                  </div>
+                              </div>
+                              {/*  Fim Coluna */}
+
+                              {/*  POP */}
+                              <div className="col-xl-3 col-lg-7">
+
+                                  <div className="card shadow mb-4">
+                                      <div className="card-header py-3">
+                                          <h6 className="m-0 font-weight-bold text-primary">Abertas por POP ({search}) </h6>
+                                      </div>
+                                      <div className="card-body">
+                                          <Chart
+                                              chartType="BarChart"
+                                              width="100%"
+                                              height="400px"
+                                              data={chartDataPop}
+                                              options={optionsPop}
+
+
+
+                                          />
+
+                                      </div>
+                                  </div>
+                              </div>
+                              {/*  Fim POP */}
+
+                              {/*  Mapa */}
+                              <div className="col-xl-6 col-lg-7">
+
+                                  <div className="card shadow mb-4">
+                                      <div className="card-header py-3">
+                                          <h6 className="m-0 font-weight-bold text-primary">Geolocalização ({search}) </h6>
+                                      </div>
+                                      <div className="card-body">
+                                      <div className="leaflet-container">
+                                          <MapContainer center={[-22.932611, -43.42839]} zoom={10}>
+
+                                              <LayersControl collapsed={true} position="topright">
+
+                                                  <TileLayer
+                                                      attribution='&amp;copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+                                                      url="https://{s}.tile.osm.org/{z}/{x}/{y}.png"
+                                                  />
+                                                  <ScaleControl>
+                                                  </ScaleControl>
+
+
+
+                                                  {filtroaplicado.map(evento => (
+                                                      <Marker key={evento.id}
+                                                          position={[evento.latitude, evento.longitude]}
+                                                          icon={icone(pops(evento.pop_id))}
+
+                                                      >
+
+                                                          <Tooltip><ul><strong>{evento.titulo} - {evento.bairro}</strong>
+                                                              <li>Descrição: {evento.descricao}</li>
+
+                                                          </ul></Tooltip>
+
+                                                          <Popup>
+
+                                                              <li className="list-head-content">Id: {evento.id} | {evento.titulo}</li>
+                                                              <li className="list-head-content">Descrição: {evento.descricao}</li>
+                                                              <li className="list-head-content">Bairro: <strong>{evento.bairro}</strong> Zona:<strong> {zonas(evento.bairro)}</strong></li>
+                                                              <li className="list-head-content">Início: {moment(evento.inicio).format('DD/MM/YYYY HH:mm')} Gravidade: {evento.gravidade}</li>
+                                                              <li className="list-head-content">Pop: {pops(evento.pop_id)} - {evento.pop_id}</li>
+                                                              <li className="list-head-content">Prazo: {evento.prazo} Status: {evento.status} tipo: {evento.tipo}</li>
+                                                              <div>
+
+                                                                  <img src={`http://187.111.99.18:9004/?CODE=${ObterCamera(evento.titulo)}`} alt=" Sem Câmera Atribuída ao Evento." width="100%" height="100%"></img>
+                                                              </div>
+
+
+
+
+                                                          </Popup>
+                                                      </Marker>
+                                                  ))}
+
+                                                  <>
+
+                                                      
+
+                                                  </>
+
+                                              </LayersControl>
+                                          </MapContainer>
+                                          </div>
+                                      </div>
+                                  </div>
+                              </div>
+                              {/*  Fim Mapa */}
+
+
                         {/*  Area Chart */}
                         <div className="col-xl-8 col-lg-7">
                             <div className="card shadow mb-4">
@@ -1243,23 +1361,7 @@ function App() {
                                 </div>
                             </div>
 
-                            {/*  Approach */}
-                            <div className="card shadow mb-4">
-                                <div className="card-header py-3">
-                                    <h6 className="m-0 font-weight-bold text-primary">Abertas ({search}) </h6>
-                                </div>
-                                <div className="card-body">
-                                <Chart
-                  chartType="Bar"
-                  width="100%"
-                  height="400px"
-                  data={chartData}
-                  options={options}
-
-                />
-
-                                </div>
-                            </div>
+                  
 
                         </div>
                     </div>
