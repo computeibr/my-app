@@ -1122,13 +1122,13 @@ function App() {
                                     <h4 className="small font-weight-bold">Primárias <span
                                             className="float-right">{Math.round(primario.length / (primario.length + secundario.length) * 100)}%</span></h4>
                                     <div className="progress mb-4">
-                                        <div className="progress-bar bg-danger" role="progressbar" style={{width: Math.round(primario.length / (primario.length + secundario.length) * 100)}}
+                                        <div className="progress-bar bg-danger" role="progressbar" style={{width: `${Math.round(primario.length / (primario.length + secundario.length) * 100)}`+"%"}}
                                             aria-valuenow={Math.round(primario.length / (primario.length + secundario.length) * 100)} aria-valuemin="0" aria-valuemax="100"></div>
                                     </div>
                                     <h4 className="small font-weight-bold">Secundárias<span
                                             className="float-right">{Math.round(secundario.length / (primario.length + secundario.length) * 100)}%</span></h4>
                                     <div className="progress mb-4">
-                                        <div className="progress-bar bg-warning" role="progressbar" style={{width: Math.round(secundario.length / (primario.length + secundario.length) * 100)}}
+                                        <div className="progress-bar bg-warning" role="progressbar" style={{width: `${Math.round(secundario.length / (primario.length + secundario.length) * 100)}`+"%"}}
                                             aria-valuenow={Math.round(secundario.length / (primario.length + secundario.length) * 100)} aria-valuemin="0" aria-valuemax="100"></div>
                                     </div>
                                     <h4 className="small font-weight-bold">Customer Database <span
@@ -1246,14 +1246,18 @@ function App() {
                             {/*  Approach */}
                             <div className="card shadow mb-4">
                                 <div className="card-header py-3">
-                                    <h6 className="m-0 font-weight-bold text-primary">Development Approach</h6>
+                                    <h6 className="m-0 font-weight-bold text-primary">Abertas ({search}) </h6>
                                 </div>
                                 <div className="card-body">
-                                    <p>SB Admin 2 makes extensive use of Bootstrap 4 utility classes in order to reduce
-                                        CSS bloat and poor page performance. Custom CSS classes are used to create
-                                        custom components and custom utility classes.</p>
-                                    <p className="mb-0">Before working with this theme, you should become familiar with the
-                                        Bootstrap framework, especially the utility classes.</p>
+                                <Chart
+                  chartType="Bar"
+                  width="100%"
+                  height="400px"
+                  data={chartData}
+                  options={options}
+
+                />
+
                                 </div>
                             </div>
 
