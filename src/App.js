@@ -1119,17 +1119,17 @@ function App() {
                                     <h6 className="m-0 font-weight-bold text-primary">Projects</h6>
                                 </div>
                                 <div className="card-body">
-                                    <h4 className="small font-weight-bold">Server Migration <span
-                                            className="float-right">20%</span></h4>
+                                    <h4 className="small font-weight-bold">Primárias <span
+                                            className="float-right">{Math.round(primario.length / (primario.length + secundario.length) * 100)}%</span></h4>
                                     <div className="progress mb-4">
-                                        <div className="progress-bar bg-danger" role="progressbar" style={{width: "20%"}}
-                                            aria-valuenow="20" aria-valuemin="0" aria-valuemax="100"></div>
+                                        <div className="progress-bar bg-danger" role="progressbar" style={{width: Math.round(primario.length / (primario.length + secundario.length) * 100)}}
+                                            aria-valuenow={Math.round(primario.length / (primario.length + secundario.length) * 100)} aria-valuemin="0" aria-valuemax="100"></div>
                                     </div>
-                                    <h4 className="small font-weight-bold">Sales Tracking <span
-                                            className="float-right">40%</span></h4>
+                                    <h4 className="small font-weight-bold">Secundárias<span
+                                            className="float-right">{Math.round(secundario.length / (primario.length + secundario.length) * 100)}%</span></h4>
                                     <div className="progress mb-4">
-                                        <div className="progress-bar bg-warning" role="progressbar" style={{width: "40%"}}
-                                            aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
+                                        <div className="progress-bar bg-warning" role="progressbar" style={{width: Math.round(secundario.length / (primario.length + secundario.length) * 100)}}
+                                            aria-valuenow={Math.round(secundario.length / (primario.length + secundario.length) * 100)} aria-valuemin="0" aria-valuemax="100"></div>
                                     </div>
                                     <h4 className="small font-weight-bold">Customer Database <span
                                             className="float-right">60%</span></h4>
