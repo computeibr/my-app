@@ -1,4 +1,589 @@
+import React from 'react';
+import { Icon } from "leaflet";
+import { useEffect, useState } from 'react';
+   
+
+import { Chart } from "react-google-charts";
+
+import 'moment/locale/pt-br'
+import _ from 'lodash';
+import axios from 'axios';
+
+import favorito from '../src/Data/favorito.json'
+
+const open = new Icon({ iconUrl: "/open.gif", iconSize: [35, 35] })
+const camera = new Icon({ iconUrl: "/camera.png", iconSize: [15, 15] })
+const operacaopolicial = new Icon({ iconUrl: "/operacaopolicial.png", iconSize: [40, 40] })
+const buraconavia = new Icon({ iconUrl: "/buraconavia.png", iconSize: [35, 35] })
+const obrasnavia = new Icon({ iconUrl: "/obrasnavia.png", iconSize: [40, 40] })
+const falhanosemaforo = new Icon({ iconUrl: "/falhanosemaforo.png", iconSize: [30, 30] })
+const acidenteleve = new Icon({ iconUrl: "/acidenteleve.png", iconSize: [40, 40] })
+const asfaltoliso = new Icon({ iconUrl: "/asfaltoliso.png", iconSize: [40, 40] })
+const evento = new Icon({ iconUrl: "/evento.png", iconSize: [40, 40], shadowSize:   [50, 64] })
+const manifestacao = new Icon({ iconUrl: "/manifestacao.png", iconSize: [40, 40], shadowSize:   [50, 64] })
+const deslizamento = new Icon({ iconUrl: "/deslizamento.png", iconSize: [40, 40], shadowSize:   [50, 64] })
+const vazamentodeagua = new Icon({ iconUrl: "/vazamentodeagua.png", iconSize: [30, 30] })
+const bueiro = new Icon({ iconUrl: "/bueiro.png", iconSize: [40, 40] })
+const incendio = new Icon({ iconUrl: "/incendio.png", iconSize: [30, 30] })
+const quedadearvore = new Icon({ iconUrl: "/quedadearvore.png", iconSize: [45, 45] })
+
+
+
+export const options = {
+    title: "Total de Ocorrências",
+    legend: { position: 'none' },
+    colors: ['#ce6b01'],
+   
+    backgroundColor: '#FFF',
+    chartArea: { width: "100%", height: "100%" },
+    
+    hAxis: {
+//      title: "Total de Ocorrências Abertas",
+      minValue: 0,
+      format: 0
+      
+    },
+    vAxis: {
+      //title: "Ocorrências por POP",
+      scaleType: 'log'
+    },
+  };
+
+  export const optionsPop = {
+    //title: "Total de Ocorrências",
+    colors: ['#ce6b01'],
+    legend: { position: 'none' },
+    backgroundColor: '#FFF',
+    chartArea: { width: "50%", height: "90%" },
+    
+    
+    hAxis: {
+//      title: "Total de Ocorrências Abertas",
+      minValue: 0,
+      format: 0
+      
+    },
+    vAxis: {
+      //title: "Ocorrências por POP",
+      scaleType: 'log'
+      
+    },
+  };
+
+  function pops(params) {
+  
+    var pop = params;
+    if (pop === 1) {pop = 'Acidente/enguiço sem vítima';
+    } else if (pop === 2) {pop = 'Acidente com vítima(s)';
+    } else if (pop === 3) {pop = 'Acidente com vítima(s) fatal(is)';
+    } else if (pop === 4) {pop = 'Incêndio em veículo(s)';
+    } else if (pop === 5) {pop = 'Bolsão dágua em via';
+    } else if (pop === 6) {pop = 'Alagamentos e enchentes';
+    } else if (pop === 7) {pop = 'Manifestação em local público';
+    } else if (pop === 8) {pop = 'Incêndio em imóvel';
+    } else if (pop === 9) {pop = 'Sinais de trânsito com mau funcionamento';
+    } else if (pop === 10) {pop = 'Reintegração de Posse';
+    } else if (pop === 11) {pop = 'Queda de árvore';
+    } else if (pop === 12) {pop = 'Queda de poste';
+    } else if (pop === 13) {pop = 'Acidente com queda de carga';
+    } else if (pop === 14) {pop = 'Incêndio no entorno de vias públicas';
+    } else if (pop === 15) {pop = 'Incêndio dentro de túneis';
+    } else if (pop === 16) {pop = 'Vazamento de água / esgoto';
+    } else if (pop === 17) {pop = 'Falta de luz / Apagão';
+    } else if (pop === 18) {pop = 'Implosão';
+    } else if (pop === 19) {pop = 'Queda de estrutura de alvenaria';
+    } else if (pop === 20) {pop = 'Vazamento de gás';
+    } else if (pop === 21) {pop = 'Evento em local público ou particular';
+    } else if (pop === 22) {pop = 'Atropelamento';
+    } else if (pop === 23) {pop = 'Afundamento de Pista / Buraco na via';
+    } else if (pop === 24) {pop = 'Abalroamento';
+    } else if (pop === 25) {pop = 'Obra em local público';
+    } else if (pop === 26) {pop = 'Operação policial';
+    } else if (pop === 27) {pop = 'Bloco de Rua';
+    } else if (pop === 28) {pop = 'Deslizamento';
+    } else if (pop === 29) {pop = 'Animal em local público';
+    } else if (pop === 30) {pop = 'Acionamento de sirenes';
+    } else if (pop === 31) {pop = 'Alagamento';
+    } else if (pop === 32) {pop = 'Enchente';
+    } else if (pop === 33) {pop = 'Lâmina dágua';
+    } else if (pop === 34) {pop = 'Acidente ambiental';
+    } else if (pop === 35) {pop = 'Bueiro';
+    } else if (pop === 36) {pop = 'Resgate ou remoção de Animais Terrestres e Aéreos';
+    } else if (pop === 37) {pop = 'Remoção de Animais Mortos na Areia';
+    } else if (pop === 38) {pop = 'Resgate de Animal Marinho Preso em rede / Encalhado';
+    } else if (pop === 39) {pop = 'Incendio em vegetacao';
+    } else if (pop === 40) {pop = 'Galho sobre fiação';
+    } else {pop = 'vazio';}
+  
+    return pop
+    
+  }
+
+  
+
+  
+function zonas(params) {
+
+  
+    var zona = params;
+    if (zona === "São Cristóvão") {zona = 'CENTRAL';
+} else if (zona === "Benfica") {zona = 'CENTRAL';
+} else if (zona === "Caju") {zona = 'CENTRAL';
+} else if (zona === "Catumbi") {zona = 'CENTRAL';
+} else if (zona === "Centro") {zona = 'CENTRAL';
+} else if (zona === "Cidade Nova") {zona = 'CENTRAL';
+} else if (zona === "Estácio") {zona = 'CENTRAL';
+} else if (zona === "Gamboa") {zona = 'CENTRAL';
+} else if (zona === "Lapa") {zona = 'CENTRAL';
+} else if (zona === "Mangueira") {zona = 'CENTRAL';
+} else if (zona === "Paquetá") {zona = 'CENTRAL';
+} else if (zona === "Rio Comprido") {zona = 'CENTRAL';
+} else if (zona === "Santa Teresa") {zona = 'CENTRAL';
+} else if (zona === "Santo Cristo") {zona = 'CENTRAL';
+} else if (zona === "Saúde") {zona = 'CENTRAL';
+} else if (zona === "Vasco da Gama") {zona = 'CENTRAL';
+} else if (zona === "Alto da Boa Vista") {zona = 'NORTE';
+} else if (zona === "Andaraí") {zona = 'NORTE';
+} else if (zona === "Grajaú") {zona = 'NORTE';
+} else if (zona === "Grajau") {zona = 'NORTE';
+} else if (zona === "Maracanã") {zona = 'NORTE';
+} else if (zona === "Praça da Bandeira") {zona = 'NORTE';
+} else if (zona.includes("Praca da Bandeira")) {zona = 'NORTE';
+} else if (zona === "Tijuca") {zona = 'NORTE';
+} else if (zona === "Vila Isabel") {zona = 'NORTE';
+} else if (zona === "Abolição") {zona = 'NORTE';
+} else if (zona === "Água Santa") {zona = 'NORTE';
+} else if (zona === "Cachambi") {zona = 'NORTE';
+} else if (zona === "Del Castilho") {zona = 'NORTE';
+} else if (zona === "Encantado") {zona = 'NORTE';
+} else if (zona === "Engenho de Dentro") {zona = 'NORTE';
+} else if (zona === "Engenho Novo") {zona = 'NORTE';
+} else if (zona === "Higienópolis") {zona = 'NORTE';
+} else if (zona === "Ilha do Governador") {zona = 'NORTE';
+} else if (zona === "Fundao") {zona = 'NORTE';
+} else if (zona === "Fundão") {zona = 'NORTE';
+} else if (zona === "Cidade Universitária da Universidade Federal do Rio de Janeiro") {zona = 'NORTE';
+} else if (zona === "Jacaré") {zona = 'NORTE';
+} else if (zona === "Jacarezinho") {zona = 'NORTE';
+} else if (zona === "Lins de Vasconcelos") {zona = 'NORTE';
+} else if (zona === "Manguinhos") {zona = 'NORTE';
+} else if (zona === "Maria da Graça") {zona = 'NORTE';
+} else if (zona === "Méier") {zona = 'NORTE';
+} else if (zona === "Piedade") {zona = 'NORTE';
+} else if (zona === "Pilares") {zona = 'NORTE';
+} else if (zona === "Riachuelo") {zona = 'NORTE';
+} else if (zona === "Rocha") {zona = 'NORTE';
+} else if (zona === "Sampaio") {zona = 'NORTE';
+} else if (zona === "São Francisco Xavier") {zona = 'NORTE';
+} else if (zona === "Todos os Santos") {zona = 'NORTE';
+} else if (zona === "Bonsucesso") {zona = 'NORTE';
+} else if (zona === "Bancários") {zona = 'NORTE';
+} else if (zona === "Cacuia") {zona = 'NORTE';
+} else if (zona === "Cidade Universitária") {zona = 'NORTE';
+} else if (zona === "Cocotá") {zona = 'NORTE';
+} else if (zona === "Freguesia") {zona = 'NORTE';
+} else if (zona === "Galeão") {zona = 'NORTE';
+} else if (zona === "Jardim Carioca") {zona = 'NORTE';
+} else if (zona === "Jardim Guanabara") {zona = 'NORTE';
+} else if (zona === "Maré") {zona = 'NORTE';
+} else if (zona === "Moneró") {zona = 'NORTE';
+} else if (zona === "Olaria") {zona = 'NORTE';
+} else if (zona === "Pitangueiras") {zona = 'NORTE';
+} else if (zona === "Portuguesa") {zona = 'NORTE';
+} else if (zona === "Praia da Bandeira") {zona = 'NORTE';
+} else if (zona === "Ramos") {zona = 'NORTE';
+} else if (zona === "Ribeira") {zona = 'NORTE';
+} else if (zona === "Tauá") {zona = 'NORTE';
+} else if (zona === "Zumbi") {zona = 'NORTE';
+} else if (zona === "Acari") {zona = 'NORTE';
+} else if (zona === "Anchieta") {zona = 'NORTE';
+} else if (zona === "Barros Filho") {zona = 'NORTE';
+} else if (zona === "Bento Ribeiro") {zona = 'NORTE';
+} else if (zona === "Brás de Pina") {zona = 'NORTE';
+} else if (zona === "Campinho") {zona = 'NORTE';
+} else if (zona === "Cavalcanti") {zona = 'NORTE';
+} else if (zona === "Cavalcante") {zona = 'NORTE';
+} else if (zona === "Cascadura") {zona = 'NORTE';
+} else if (zona === "Coelho Neto") {zona = 'NORTE';
+} else if (zona === "Colégio") {zona = 'NORTE';
+} else if (zona === "Complexo do Alemão") {zona = 'NORTE';
+} else if (zona === "Cordovil") {zona = 'NORTE';
+} else if (zona === "Costa Barros") {zona = 'NORTE';
+} else if (zona === "Engenheiro Leal") {zona = 'NORTE';
+} else if (zona === "Engenho da Rainha") {zona = 'NORTE';
+} else if (zona === "Guadalupe") {zona = 'NORTE';
+} else if (zona === "Galeao") {zona = 'NORTE';
+} else if (zona === "Galeão") {zona = 'NORTE';
+} else if (zona === "Honório Gurgel") {zona = 'NORTE';
+} else if (zona === "Inhaúma") {zona = 'NORTE';
+} else if (zona === "Inhauma") {zona = 'NORTE';
+} else if (zona === "Irajá") {zona = 'NORTE';
+} else if (zona === "Jardim América") {zona = 'NORTE';
+} else if (zona === "Madureira") {zona = 'NORTE';
+} else if (zona === "Marechal Hermes") {zona = 'NORTE';
+} else if (zona === "Mal. Hermes") {zona = 'NORTE';
+} else if (zona === "Oswaldo Cruz") {zona = 'NORTE';
+} else if (zona === "Parada de Lucas") {zona = 'NORTE';
+} else if (zona === "Parque Anchieta") {zona = 'NORTE';
+} else if (zona === "Parque Colúmbia") {zona = 'NORTE';
+} else if (zona === "Parque Columbia") {zona = 'NORTE';
+} else if (zona === "Pavuna") {zona = 'NORTE';
+} else if (zona === "Penha") {zona = 'NORTE';
+} else if (zona === "Penha Circular") {zona = 'NORTE';
+} else if (zona === "Quintino Bocaiúva") {zona = 'NORTE';
+} else if (zona === "Quintino Bocaiuva") {zona = 'NORTE';
+} else if (zona === "Ricardo de Albuquerque") {zona = 'NORTE';
+} else if (zona === "Rocha Miranda") {zona = 'NORTE';
+} else if (zona === "Tomás Coelho") {zona = 'NORTE';
+} else if (zona === "Tomas Coelho") {zona = 'NORTE';
+} else if (zona === "Turiaçu") {zona = 'NORTE';
+} else if (zona === "Turiacu") {zona = 'NORTE';
+} else if (zona === "Vaz Lobo") {zona = 'NORTE';
+} else if (zona === "Váz Lobo") {zona = 'NORTE';
+} else if (zona === "Vicente de Carvalho") {zona = 'NORTE';
+} else if (zona === "Vigario Geral") {zona = 'NORTE';
+} else if (zona === "Vigário Geral") {zona = 'NORTE';
+} else if (zona === "Vila da Penha") {zona = 'NORTE';
+} else if (zona === "Vila Kosmos") {zona = 'NORTE';
+} else if (zona === "Vista Alegre") {zona = 'NORTE';
+} else if (zona === "São Conrado") {zona = 'SUL';
+} else if (zona === "Sao Conrado") {zona = 'SUL';
+} else if (zona === "Lagoa") {zona = 'SUL';
+} else if (zona === "Botafogo") {zona = 'SUL';
+} else if (zona === "Catete") {zona = 'SUL';
+} else if (zona === "Copacabana") {zona = 'SUL';
+} else if (zona.includes("Arpoador")) {zona = 'SUL';
+} else if (zona === "Cosme Velho") {zona = 'SUL';
+} else if (zona === "Flamengo") {zona = 'SUL';
+} else if (zona === "Gávea") {zona = 'SUL';
+} else if (zona === "Gavea") {zona = 'SUL';
+} else if (zona === "Glória") {zona = 'SUL';
+} else if (zona === "Gloria") {zona = 'SUL';
+} else if (zona === "Humaitá") {zona = 'SUL';
+} else if (zona === "Humaita") {zona = 'SUL';
+} else if (zona === "Ipanema") {zona = 'SUL';
+} else if (zona === "Jardim Botânico") {zona = 'SUL';
+} else if (zona === "Jardim Botanico") {zona = 'SUL';
+} else if (zona === "Laranjeiras") {zona = 'SUL';
+} else if (zona === "Leblon") {zona = 'SUL';
+} else if (zona === "Leme") {zona = 'SUL';
+} else if (zona.includes("Rocinha")) {zona = 'SUL';
+} else if (zona === "Urca") {zona = 'SUL';
+} else if (zona === "Vidigal") {zona = 'SUL';
+} else if (zona === "Anil") {zona = 'OESTE';
+} else if (zona === "Barra da Tijuca") {zona = 'OESTE';
+} else if (zona === "Camorim") {zona = 'OESTE';
+} else if (zona === "Cidade de Deus") {zona = 'OESTE';
+} else if (zona === "Curicica") {zona = 'OESTE';
+} else if (zona === "Freguesia de Jacarepaguá") {zona = 'OESTE';
+} else if (zona === "Gardênia Azul") {zona = 'OESTE';
+} else if (zona === "Gardenia Azul") {zona = 'OESTE';
+} else if (zona === "Grumari") {zona = 'OESTE';
+} else if (zona === "Itanhangá") {zona = 'OESTE';
+} else if (zona === "Itanhanga") {zona = 'OESTE';
+} else if (zona === "Jacarepaguá") {zona = 'OESTE';
+} else if (zona === "Jacarepagua") {zona = 'OESTE';
+} else if (zona === "Joá") {zona = 'OESTE';
+} else if (zona === "Joa") {zona = 'OESTE';
+} else if (zona === "Praça Seca") {zona = 'OESTE';
+} else if (zona === "Praca Seca") {zona = 'OESTE';
+} else if (zona === "Pechincha") {zona = 'OESTE';
+} else if (zona === "Recreio dos Bandeirantes") {zona = 'OESTE';
+} else if (zona === "Rio das Pedras") {zona = 'OESTE';
+} else if (zona === "Tanque") {zona = 'OESTE';
+} else if (zona === "Taquara") {zona = 'OESTE';
+} else if (zona === "Vargem Grande") {zona = 'OESTE';
+} else if (zona === "Vargem Pequena") {zona = 'OESTE';
+} else if (zona === "Vila Valqueire") {zona = 'OESTE';
+} else if (zona === "Jardim Sulacap") {zona = 'OESTE';
+} else if (zona === "Bangu") {zona = 'OESTE';
+} else if (zona === "Bangú") {zona = 'OESTE';
+} else if (zona === "Campo dos Afonsos") {zona = 'OESTE';
+} else if (zona === "Deodoro") {zona = 'OESTE';
+} else if (zona === "Gericinó") {zona = 'OESTE';
+} else if (zona === "Magalhães Bastos") {zona = 'OESTE';
+} else if (zona === "Padre Miguel") {zona = 'OESTE';
+} else if (zona === "Realengo") {zona = 'OESTE';
+} else if (zona === "Santíssimo") {zona = 'OESTE';
+} else if (zona === "Senador Camará") {zona = 'OESTE';
+} else if (zona === "Vila Kennedy") {zona = 'OESTE';
+} else if (zona === "Vila Militar") {zona = 'OESTE';
+} else if (zona === "Barra de Guaratiba") {zona = 'OESTE';
+} else if (zona === "Campo Grande") {zona = 'OESTE';
+} else if (zona === "Cosmos") {zona = 'OESTE';
+} else if (zona === "Guaratiba") {zona = 'OESTE';
+} else if (zona === "Inhoaíba") {zona = 'OESTE';
+} else if (zona === "Paciência") {zona = 'OESTE';
+} else if (zona === "Paciencia") {zona = 'OESTE';
+} else if (zona === "Pedra de Guaratiba") {zona = 'OESTE';
+} else if (zona === "Santa Cruz") {zona = 'OESTE';
+} else if (zona === "Senador Vasconcelos") {zona = 'OESTE';
+} else if (zona === "Sepetiba") {zona = 'OESTE';
+    } else {zona = 'N/D';}
+  
+    return zona
+    
+  }
+
+
 function App() {
+
+
+    const moment = require('moment');
+  
+    const [eventosAbertos, setEventosAbertos] = useState([]);
+    const [chartData, setChartData] = useState([]);
+    const [chartDataPop, setChartDataPop] = useState([]);
+    const [primario, setPrimario] = useState([]);
+    const [secundario, setSecundario] = useState([]);
+    const [countdown, setCountdown] = useState(300000)
+    const [filtroaplicado, setFiltroAplicado] = useState([]);
+    const [search, setSearch] = useState("TODOS");
+    const [showcameras, setShowCameras] = useState("Não");
+    const [estagio, setEstagio] = useState("Branco");
+    const [tempoestagio, setTempoEstagio] = useState(" ");
+    const [corestagio, setCorEstagio] = useState("#ffffff");
+    const [mensagemestagio, setMensagemEstagio] = useState("");
+    const [mensagem2estagio, setMensagem2Estagio] = useState("");
+    
+  
+    const [status, setStatus] = useState({
+      loading: false
+    });
+  
+      function ObterCorLinha(prioridade) {
+          if (prioridade === 'BAIXO' || prioridade === null) {
+              return 'table-success';
+          }
+          if (prioridade === 'MEDIO') {
+              return 'table-warning';
+          }
+  
+          if (prioridade === 'ALTA') {
+              return 'table-danger';
+          }
+      }
+  
+      function ObterCamera(props) {
+        //if (props.includes('CAM ')) {return props;}
+  
+        const titulo = props.normalize('NFD').replace(/[\])}[{(]/g, '').toLowerCase();
+        const dataPtBr = titulo.split(' ')
+        const lista = dataPtBr.length
+        // let id = food.normalize('NFD').replace(/[\u0300-\u036f]/g, "").replace(/\s/g, '').replace(/\./g, '').replace(/[\])}[{(]/g, '').toLowerCase() + '&&' + food; 
+        
+        
+          if (dataPtBr.length >= (dataPtBr.length-1)) {
+            const lista = dataPtBr.length-1
+            const cam = parseInt(dataPtBr[lista])
+            if(typeof(cam)){
+              return cam
+             }else{
+              return '150'
+             }
+          }
+      }
+      
+    function icone(props) {
+  
+      if (props === '') {return open;}
+      if (props.includes('Operação policial')) {return operacaopolicial;}
+      if (props === 'Afundamento de Pista / Buraco na via') {return buraconavia;}
+      if (props.includes('Atropelamento')) {return acidenteleve;}
+      if (props.includes('Obra em local público')) {return obrasnavia;}
+      if (props.includes('Evento')) {return evento;}
+      if (props.includes('Asfalto')) {return asfaltoliso;}
+      if (props.includes('Acidente/enguiço sem vítima')) {return acidenteleve;}
+      if (props === "Acidente com vítima(s)") {return acidenteleve;}
+      if (props.includes('Manifestação em local público')) {return manifestacao;}
+      if (props.includes('Deslizamento')) {return deslizamento;}
+      if (props.includes('Incêndio no entorno de vias públicas')) {  return incendio;}
+      if (props.includes('Incêndio em imóvel')) {return incendio;}
+      if (props.includes('Incêndio em veículo(s)')) {return incendio;}
+      if (props ==='Sinais de trânsito com mau funcionamento') {return falhanosemaforo;}
+      if (props ==='Vazamento de água / esgoto') { return vazamentodeagua;}
+      if (props ==='Galho sobre fiação') {return open;}
+      if (props ==='Bueiro') {return bueiro;}
+      if (props ==='Queda de árvore') {return quedadearvore;}
+  
+      
+  
+      
+      
+  
+      return open;
+    }
+  
+    
+  
+  
+  
+    const filtroPrimario = (data) => {
+  
+      const filteres = data.filter((valorAtual) => {
+        return valorAtual.tipo.includes("PRIMARIO")
+            })
+        return filteres
+     }
+  
+     const filtroSecundario = (data) => {
+  
+      const filteres = data.filter((valorAtual) => {
+        return valorAtual.tipo.includes("SECUNDARIO")
+            })
+        return filteres
+     }
+  
+    const loadData = (data) => {
+        const values = _.groupBy(data, (value) => zonas(value.bairro));
+        const result = _.map(values, (value, key) => [
+            key,
+            values[key].length
+        ]);
+        return [["Ocorrência", "Abertas"], ...result];
+    }
+  
+  
+  
+    const loadDataPop = (data) => {
+        const values = _.groupBy(data, (value) => pops(value.pop_id));
+        const result = _.map(values, (value, key) => [
+            key,
+            values[key].length
+        ]);
+        return [["Ocorrência", "Abertas"], ...result];
+    }
+    
+    
+    
+    const getAlertas = async () => {
+      console.count("Reiniciou getAlertas   " +  moment(Date.now()).format('DD/MM/YYYY HH:mm:ss'));
+      await axios({
+          method: 'get',
+          baseURL: 'http://aplicativo.cocr.com.br/estagio_api'
+                          
+        }).then(estagioatual => {
+          
+    try {
+      setTempoEstagio(moment(estagioatual.data.inicio).format('DD/MM/YYYY HH:mm') + " " + "(" + moment(estagioatual.data.inicio).startOf('hour').fromNow() + "" + ")");
+      setEstagio(estagioatual.data.estagio);
+      setCorEstagio(estagioatual.data.cor);
+      setMensagemEstagio(estagioatual.data.mensagem);
+      setMensagem2Estagio(estagioatual.data.mensagem2);
+    
+  } catch (error) {
+    console.log(error)
+    setTempoEstagio("Não conseguimos o acesso a api que retorna informações do Estágio Atual da Cidade");
+    setEstagio("Branco");
+    setCorEstagio("#ffffff")
+    setMensagemEstagio("");
+    setMensagem2Estagio("");
+  
+  }
+  
+  
+            
+  
+      }).catch(err => {
+        console.log(err)
+        setTempoEstagio("Não conseguimos o acesso a api que retorna informações do Estágio Atual da Cidade");
+        setCorEstagio("#ffffff")
+        setMensagemEstagio("");
+    setMensagem2Estagio("");
+      });
+  }
+  useEffect(() => {getAlertas();}, [])
+  
+    const getEventosAbertos = async () => {
+      console.count("Reiniciou getEventosAbertos   " +  moment(Date.now()).format('DD/MM/YYYY HH:mm:ss'));
+      await axios({
+          method: 'get',
+          baseURL: 'https://api.dados.rio/v2/adm_cor_comando/ocorrencias_abertas'
+          
+  //        https://api.dados.rio/v2/adm_cor_comando/ocorrencias_abertas/
+                          
+      }).then(evento => {
+  
+          try {
+            setEventosAbertos(evento.data.eventos);
+            setChartData(loadData(evento.data.eventos));
+            setChartDataPop(loadDataPop(evento.data.eventos));
+            setFiltroAplicado(evento.data.eventos);
+            setPrimario(filtroPrimario(evento.data.eventos));
+            setSecundario(filtroSecundario(evento.data.eventos));
+            setSearch(favorito.tipo);
+  
+            if (evento.status > 200) {
+              setCountdown(10001)
+              console.count("status: " + evento.status + "Contador em 10001   " +  moment(Date.now()).format('DD/MM/YYYY HH:mm:ss'));
+            } else {setCountdown(300000)
+              console.count("status: " + evento.status + " Contador em 300000   " +  moment(Date.now()).format('DD/MM/YYYY HH:mm:ss'));
+            }
+  
+  
+          } catch (error) {
+  
+              setCountdown(10001)
+              console.count("Contador em 10001 Erro catch   " +  moment(Date.now()).format('DD/MM/YYYY HH:mm:ss'));
+          }
+  
+        setStatus({
+          loading: true
+      })
+  
+  
+      }).catch(err => {
+        setCountdown(10001)
+        console.count("Erro catch then Contador em 10001    " +  moment(Date.now()).format('DD/MM/YYYY HH:mm:ss'));
+          setStatus({
+            loading: false
+        })
+      });
+  }
+  useEffect(() => {getEventosAbertos();}, [])
+  
+  const getEventosJaFiltrados = async () => {
+      
+  
+    if(search === "TODOS") {
+  
+        setFiltroAplicado(eventosAbertos);
+        setChartData(loadData(eventosAbertos));
+        setChartDataPop(loadDataPop(eventosAbertos));
+        setFiltroAplicado(eventosAbertos);
+    }
+  
+  
+    if(search === "PRIMARIO") {
+  
+        setChartData(loadData(primario));
+        setChartDataPop(loadDataPop(primario));
+        setFiltroAplicado(primario);
+    }
+  
+    if(search === "SECUNDARIO") {
+  
+        setChartData(loadData(secundario));
+        setChartDataPop(loadDataPop(secundario));
+        setFiltroAplicado(secundario);
+    }
+   
+  }
+  useEffect(() => {getEventosJaFiltrados();}, [search, filtroaplicado]);
+  
+    useEffect(() => {
+      const timerId = setInterval(() => {
+        setCountdown(prevState => prevState - 1)
+        
+        getEventosAbertos();
+        getAlertas();
+        
+      }, countdown);
+      return () => clearInterval(timerId)
+    }, [countdown])
+
+
+
   return (
    <>
    
@@ -356,13 +941,13 @@ function App() {
 
                         {/*  Earnings (Monthly) Card Example */}
                         <div className="col-xl-3 col-md-6 mb-4">
-                            <div className="card border-left-primary shadow h-100 py-2">
+                            <div className="card border-left-danger shadow h-100 py-2">
                                 <div className="card-body">
                                     <div className="row no-gutters align-items-center">
                                         <div className="col mr-2">
-                                            <div className="text-xs font-weight-bold text-primary text-uppercase mb-1">
-                                                Earnings (Monthly)</div>
-                                            <div className="h5 mb-0 font-weight-bold text-gray-800">$40,000</div>
+                                            <div className="h5 text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                                ABERTAS: {eventosAbertos.length}</div>
+                                            <div className="h5 mb-0 font-weight-bold text-gray-800">{primario.length} Primárias e {secundario.length} Secundárias</div>
                                         </div>
                                         <div className="col-auto">
                                             <i className="fas fa-calendar fa-2x text-gray-300"></i>
@@ -378,9 +963,9 @@ function App() {
                                 <div className="card-body">
                                     <div className="row no-gutters align-items-center">
                                         <div className="col mr-2">
-                                            <div className="text-xs font-weight-bold text-success text-uppercase mb-1">
-                                                Earnings (Annual)</div>
-                                            <div className="h5 mb-0 font-weight-bold text-gray-800">$215,000</div>
+                                            <div className="h5 text-xs font-weight-bold text-success text-uppercase mb-1">
+                                                FECHADAS HOJE</div>
+                                            <div className="h5 mb-0 font-weight-bold text-gray-800">{primario.length} Primárias e {secundario.length} Secundárias</div>
                                         </div>
                                         <div className="col-auto">
                                             <i className="fas fa-dollar-sign fa-2x text-gray-300"></i>
@@ -466,6 +1051,14 @@ function App() {
                                 <div className="card-body">
                                     <div className="chart-area">
                                         <canvas id="myAreaChart"></canvas>
+                                        <Chart
+                  chartType="Bar"
+                  width="100%"
+                  height="400px"
+                  data={chartData}
+                  options={options}
+
+                />
                                     </div>
                                 </div>
                             </div>
